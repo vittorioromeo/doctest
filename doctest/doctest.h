@@ -541,8 +541,6 @@ basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&, const char
 template <class charT, class traits>
 class basic_istream;
 typedef basic_istream<char, char_traits<char>> istream; // NOLINT(modernize-use-using)
-template <class... Types>
-class tuple;
 #if DOCTEST_MSVC >= DOCTEST_COMPILER(19, 20, 0)
 // see this issue on why this is needed: https://github.com/doctest/doctest/issues/183
 template <class Ty>
@@ -2234,8 +2232,8 @@ int registerReporter(const char* name, int priority, bool isReporter) {
     namespace { /* NOLINT */                                                                       \
         template <typename Tuple>                                                                  \
         struct iter;                                                                               \
-        template <typename Type, typename... Rest>                                                 \
-        struct iter<std::tuple<Type, Rest...>>                                                     \
+        template <template <typename...> class Tuple, typename Type, typename... Rest>                                                 \
+        struct iter<Tuple<Type, Rest...>>                                                     \
         {                                                                                          \
             iter(const char* file, unsigned line, int index) {                                     \
                 doctest::detail::regTest(doctest::detail::TestCase(func<Type>, file, line,         \
@@ -2243,11 +2241,11 @@ int registerReporter(const char* name, int priority, bool isReporter) {
                                             doctest::toString<Type>(),                             \
                                             int(line) * 1000 + index)                              \
                                          * dec);                                                   \
-                iter<std::tuple<Rest...>>(file, line, index + 1);                                  \
+                iter<Tuple<Rest...>>(file, line, index + 1);                                  \
             }                                                                                      \
         };                                                                                         \
-        template <>                                                                                \
-        struct iter<std::tuple<>>                                                                  \
+        template <template <typename...> class Tuple>                                                                                \
+        struct iter<Tuple<>>                                                                  \
         {                                                                                          \
             iter(const char*, unsigned, int) {}                                                    \
         };                                                                                         \
@@ -2264,8 +2262,10 @@ int registerReporter(const char* name, int priority, bool isReporter) {
         doctest::detail::instantiationHelper(                                                      \
             DOCTEST_CAT(id, ITERATOR)<__VA_ARGS__>(__FILE__, __LINE__, 0)))
 
+template <typename... Ts> struct typelist { };
+
 #define DOCTEST_TEST_CASE_TEMPLATE_INVOKE(id, ...)                                                 \
-    DOCTEST_TEST_CASE_TEMPLATE_INSTANTIATE_IMPL(id, DOCTEST_ANONYMOUS(DOCTEST_ANON_TMP_), std::tuple<__VA_ARGS__>) \
+    DOCTEST_TEST_CASE_TEMPLATE_INSTANTIATE_IMPL(id, DOCTEST_ANONYMOUS(DOCTEST_ANON_TMP_), typelist<__VA_ARGS__>) \
     static_assert(true, "")
 
 #define DOCTEST_TEST_CASE_TEMPLATE_APPLY(id, ...)                                                  \
@@ -2274,7 +2274,7 @@ int registerReporter(const char* name, int priority, bool isReporter) {
 
 #define DOCTEST_TEST_CASE_TEMPLATE_IMPL(dec, T, anon, ...)                                         \
     DOCTEST_TEST_CASE_TEMPLATE_DEFINE_IMPL(dec, T, DOCTEST_CAT(anon, ITERATOR), anon);             \
-    DOCTEST_TEST_CASE_TEMPLATE_INSTANTIATE_IMPL(anon, anon, std::tuple<__VA_ARGS__>)               \
+    DOCTEST_TEST_CASE_TEMPLATE_INSTANTIATE_IMPL(anon, anon, typelist<__VA_ARGS__>)               \
     template <typename T>                                                                          \
     static void anon()
 
