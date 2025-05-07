@@ -78,6 +78,8 @@ DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 
 DOCTEST_MSVC_SUPPRESS_WARNING(5045) // Spectre mitigation diagnostics
+DOCTEST_CLANG_SUPPRESS_WARNING("-Wunsafe-buffer-usage")
+DOCTEST_CLANG_SUPPRESS_WARNING("-Wunsafe-buffer-usage-in-libc-call")
 
 // the standard forbids writing in the std namespace but it works on all compilers
 namespace std // NOLINT(cert-dcl58-cpp)
@@ -256,7 +258,7 @@ TEST_CASE("pointer comparisons") {
     int i = 42;
     int* a = &i;
     int* b = a;
-    
+
     CHECK(a == b);
     CHECK_EQ(a, b);
 

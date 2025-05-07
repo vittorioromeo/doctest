@@ -28,6 +28,10 @@ DOCTEST_CLANG_SUPPRESS_WARNING("-Wmissing-braces")
 DOCTEST_CLANG_SUPPRESS_WARNING("-Wmissing-field-initializers")
 DOCTEST_CLANG_SUPPRESS_WARNING("-Wunused-member-function")
 DOCTEST_CLANG_SUPPRESS_WARNING("-Wnonportable-system-include-path")
+DOCTEST_CLANG_SUPPRESS_WARNING("-Wunsafe-buffer-usage")
+DOCTEST_CLANG_SUPPRESS_WARNING("-Wunsafe-buffer-usage-in-libc-call")
+
+
 
 DOCTEST_GCC_SUPPRESS_WARNING_PUSH
 DOCTEST_GCC_SUPPRESS_WARNING("-Wconversion")
@@ -813,7 +817,7 @@ const char* skipPathFromFilename(const char* file) {
         {
             const auto prefix_start = pos;
             pos = std::min(prefixes.find(separator, prefix_start), prefixes.size());
-            
+
             const auto prefix_size = pos - prefix_start;
             if(prefix_size > longest_match)
             {

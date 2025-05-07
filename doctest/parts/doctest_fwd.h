@@ -164,6 +164,8 @@
     DOCTEST_CLANG_SUPPRESS_WARNING("-Wmissing-prototypes")                                         \
     DOCTEST_CLANG_SUPPRESS_WARNING("-Wc++98-compat")                                               \
     DOCTEST_CLANG_SUPPRESS_WARNING("-Wc++98-compat-pedantic")                                      \
+    DOCTEST_CLANG_SUPPRESS_WARNING("-Wunsafe-buffer-usage")                                        \
+    DOCTEST_CLANG_SUPPRESS_WARNING("-Wunsafe-buffer-usage-in-libc-call")                           \
                                                                                                    \
     DOCTEST_GCC_SUPPRESS_WARNING_PUSH                                                              \
     DOCTEST_GCC_SUPPRESS_WARNING("-Wunknown-pragmas")                                              \

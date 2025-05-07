@@ -13,6 +13,8 @@ DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 DOCTEST_GCC_SUPPRESS_WARNING("-Wmissing-declarations")
 DOCTEST_CLANG_SUPPRESS_WARNING("-Wmissing-prototypes")
+DOCTEST_CLANG_SUPPRESS_WARNING("-Wunsafe-buffer-usage")
+DOCTEST_CLANG_SUPPRESS_WARNING("-Wunsafe-buffer-usage-in-libc-call")
 
 // some function which uses asserts not just for unit testing but also for ensuring contracts in production code
 static void some_func() {
