@@ -502,12 +502,6 @@ DOCTEST_GCC_SUPPRESS_WARNING_POP
 #endif
 #endif // clang
 
-#ifdef _LIBCPP_VERSION
-#ifndef DOCTEST_CONFIG_USE_STD_HEADERS
-#define DOCTEST_CONFIG_USE_STD_HEADERS
-#endif
-#endif // _LIBCPP_VERSION
-
 #ifdef DOCTEST_CONFIG_USE_STD_HEADERS
 #ifndef DOCTEST_CONFIG_INCLUDE_TYPE_TRAITS
 #define DOCTEST_CONFIG_INCLUDE_TYPE_TRAITS
@@ -522,17 +516,34 @@ DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 // Forward declaring 'X' in namespace std is not permitted by the C++ Standard.
 DOCTEST_MSVC_SUPPRESS_WARNING_WITH_PUSH(4643)
 
-namespace std { // NOLINT(cert-dcl58-cpp)
-typedef decltype(nullptr) nullptr_t; // NOLINT(modernize-use-using)
-typedef decltype(sizeof(void*)) size_t; // NOLINT(modernize-use-using)
+#if defined(_LIBCPP_VERSION) && __has_include(<__fwd/ostream.h>) && __has_include(<__fwd/istream.h>)
+
+#include <__fwd/ostream.h>
+#include <__fwd/istream.h>
+
+_LIBCPP_BEGIN_NAMESPACE_STD                             // NOLINT(cert-dcl58-cpp)
+typedef decltype(nullptr)       nullptr_t; // NOLINT(modernize-use-using)
+typedef decltype(sizeof(void*)) size_t;    // NOLINT(modernize-use-using)
+
+template <class traits>
+// NOLINTNEXTLINE
+_LIBCPP_HIDE_FROM_ABI basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&, const char*);
+
+_LIBCPP_END_NAMESPACE_STD
+
+#else
+
+namespace std {                            // NOLINT(cert-dcl58-cpp)
+typedef decltype(nullptr)       nullptr_t; // NOLINT(modernize-use-using)
+typedef decltype(sizeof(void*)) size_t;    // NOLINT(modernize-use-using)
 template <class charT>
 struct char_traits;
 template <>
 struct char_traits<char>;
 template <class charT, class traits>
-class basic_ostream; // NOLINT(fuchsia-virtual-inheritance)
+class basic_ostream;                                    // NOLINT(fuchsia-virtual-inheritance)
 typedef basic_ostream<char, char_traits<char>> ostream; // NOLINT(modernize-use-using)
-template<class traits>
+template <class traits>
 // NOLINTNEXTLINE
 basic_ostream<char, traits>& operator<<(basic_ostream<char, traits>&, const char*);
 template <class charT, class traits>
@@ -547,6 +558,8 @@ class basic_string;
 using string = basic_string<char, char_traits<char>, allocator<char>>;
 #endif // VS 2019
 } // namespace std
+
+#endif
 
 DOCTEST_MSVC_SUPPRESS_WARNING_POP
 
@@ -565,6 +578,7 @@ DOCTEST_INTERFACE extern bool is_running_in_test;
 #ifndef DOCTEST_CONFIG_STRING_SIZE_TYPE
 #define DOCTEST_CONFIG_STRING_SIZE_TYPE unsigned
 #endif
+
 
 // A 24 byte string class (can be as small as 17 for x64 and 13 for x86) that can hold strings with length
 // of up to 23 chars on the stack before going on the heap - the last byte of the buffer is used for:
